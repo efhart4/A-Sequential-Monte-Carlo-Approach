@@ -814,8 +814,12 @@ def test_MH_sampler():
     iterations = 34
 
     # Create empty arrays to store the results
-    samples_MH_T = np.empty((iterations,), dtype=object)
-    samples_MH_N = np.empty((iterations,), dtype=object)
+    medians_MH_T = np.empty((iterations,), dtype=object)
+    medians_MH_N = np.empty((iterations,), dtype=object)
+
+    stds_MH_T = np.empty((iterations,), dtype=object)
+    stds_MH_N = np.empty((iterations,), dtype=object)
+
     acceptance_MH_T = np.empty((iterations,), dtype=object)
     acceptance_MH_N = np.empty((iterations,), dtype=object)
     collection_squared_error_T = np.empty((iterations,), dtype=object)
@@ -884,30 +888,35 @@ def test_MH_sampler():
             collection_squared_error_T[i] = squared_error_at_each_time_step_T
 
             # Save the results at each iteration
-            samples_MH_T[i] = np.median(samples_T, axis=1)
+            medians_MH_T[i] = np.median(samples_T, axis=1)
             acceptance_MH_T[i] = acceptance_T
             
-            samples_MH_N[i] = np.median(samples_N, axis=1)
+            medians_MH_N[i] = np.median(samples_N, axis=1)
             acceptance_MH_N[i] = acceptance_N
+
+            # find the standard deviation of the samples
+            stds_MH_N[i] = np.std(samples_N, axis=1)
+            stds_MH_T[i] = np.std(samples_T, axis=1)
 
             i += 1
 
-    # find the mean of the samples
-    sample_mean_N =  np.mean(samples_MH_N, axis=0) 
-    sample_mean_T = np.mean(samples_MH_T, axis=0) 
+    # find the mean of the medians
+    sample_mean_median_N =  np.mean(medians_MH_N, axis=0) 
+    sample_mean_median_T = np.mean(medians_MH_T, axis=0) 
 
     # find the mean of the acceptance rates
     acceptance_mean_N = np.mean(acceptance_MH_N)
     acceptance_mean_T = np.mean(acceptance_MH_T)
 
-    # find the standard deviation of the samples
-    sample_std_N = np.std(samples_N, axis=1)
-    sample_std_T = np.std(samples_T, axis=1)
+    # find the mean of standard deviation
+    sample_std_N = np.mean(stds_MH_N, axis=0)
+    sample_std_T = np.mean(stds_MH_T, axis=0)
+
 
     # find the per period mean of the squared error
     mean_MSE_T = np.mean(collection_squared_error_T, axis=0)
     mean_MSE_N = np.mean(collection_squared_error_N, axis=0)
 
-    return sample_mean_N, sample_mean_T, sample_std_N, sample_std_T, acceptance_mean_N, acceptance_mean_T, mean_MSE_T, mean_MSE_N
+    return sample_mean_median_N, sample_mean_median_T, sample_std_N, sample_std_T, acceptance_mean_N, acceptance_mean_T, mean_MSE_T, mean_MSE_N
 
 
