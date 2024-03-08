@@ -4,7 +4,7 @@ import pandas as pd
 import pickle
 
 # Load the results
-with open('/Users/modelt/Documents/Research/Extended Particle FIlter/Experiment 3/results.npy', 'rb') as f:
+with open('/results.npy', 'rb') as f:
     result = pickle.load(f)
 
 # Handle result
