@@ -865,15 +865,17 @@ def test_MH_sampler():
     print("Start time:", datetime.now().strftime('%H:%M:%S'))
 
     # Set the number of iterations
-    iterations = 34
+    iterations = 5
 
     # Create empty arrays to store the results
     samples_MH_W = np.empty((iterations,), dtype=object)
     samples_MH_WO = np.empty((iterations,), dtype=object)
+    sample_std_WO = np.empty((iterations,), dtype=object)
+    sample_std_W = np.empty((iterations,), dtype=object)
     acceptance_MH_W = np.empty((iterations,), dtype=object)
     acceptance_MH_WO = np.empty((iterations,), dtype=object)
-    collection_MSE_W = np.empty((iterations,), dtype=object)
-    collection_MSE_WO = np.empty((iterations,), dtype=object)
+    collection_squared_error_W = np.empty((iterations,), dtype=object)
+    collection_squared_error_WO = np.empty((iterations,), dtype=object)
 
     # Run the Metropolis Hasting Sampler for the number of iterations
     i = 0
@@ -926,28 +928,18 @@ def test_MH_sampler():
             print("Acceptance Rate:", acceptance_WO)
             print("Median of samples:", np.round(np.median(samples_WO, axis=1), decimals=3) )
 
-            # Subtract the target variable from each path and square the result
-            squared_error_W = (sample_paths_W - TVP.to_numpy().reshape(-1, 1)) ** 2
-            squared_error_WO = (sample_paths_WO - TVP.to_numpy().reshape(-1, 1)) ** 2
 
             # Find the mean over all the paths given by a single iteration for both types of filters,
-            MSE_W = np.mean(squared_error_W, axis=1)
-            MSE_WO = np.mean(squared_error_WO, axis=1)
-
-            """# Find the mean over all the paths given by a single iteration for both types of filters,
             mean_sample_path_iteration_W = np.mean(sample_paths_W, axis=1)
             mean_sample_path_iteration_WO = np.mean(sample_paths_WO, axis=1)
             
             
             # Now that we have a single path for each iteration, we can find the squared error at each time step
             squared_error_at_each_time_step_WO =  (mean_sample_path_iteration_WO - TVP) ** 2
-            squared_error_at_each_time_step_W =  (mean_sample_path_iteration_W - TVP) ** 2
-            """
+            collection_squared_error_WO[i] = squared_error_at_each_time_step_WO
 
-            
-            
-            collection_MSE_WO[i] = MSE_WO
-            collection_MSE_W[i] = MSE_W
+            squared_error_at_each_time_step_W =  (mean_sample_path_iteration_W - TVP) ** 2
+            collection_squared_error_W[i] = squared_error_at_each_time_step_W
 
 
             # Save the results at each iteration
@@ -956,6 +948,10 @@ def test_MH_sampler():
             
             samples_MH_WO[i] = np.median(samples_WO, axis=1)
             acceptance_MH_WO[i] = acceptance_WO
+
+            # find the standard deviation of the samples
+            sample_std_WO[i] = np.std(samples_WO, axis=1)
+            sample_std_W[i] = np.std(samples_W, axis=1)
 
             
             i += 1
@@ -968,16 +964,18 @@ def test_MH_sampler():
     acceptance_mean_WO = np.mean(acceptance_MH_WO)
     acceptance_mean_W = np.mean(acceptance_MH_W)
 
-    # find the standard deviation of the samples
-    sample_std_WO = np.std(samples_WO, axis=1)
-    sample_std_W = np.std(samples_W, axis=1)
+    # find the mean of standard deviation
+    mean_sample_std_WO = np.mean(sample_std_WO, axis=0)
+    mean_sample_std_W = np.mean(sample_std_W, axis=0)
+
+
 
     
     # find the per period mean of the squared error
-    mean_MSE_W = np.mean(collection_MSE_W, axis=0)
-    mean_MSE_WO = np.mean(collection_MSE_WO, axis=0)
+    mean_MSE_W = np.mean(collection_squared_error_W, axis=0)
+    mean_MSE_WO = np.mean(collection_squared_error_WO, axis=0)
     
-    return sample_mean_WO, sample_mean_W, sample_std_WO, sample_std_W, acceptance_mean_WO, acceptance_mean_W, mean_MSE_W, mean_MSE_WO
+    return sample_mean_WO, sample_mean_W, mean_sample_std_WO, mean_sample_std_W, acceptance_mean_WO, acceptance_mean_W, mean_MSE_W, mean_MSE_WO
 
 
 
