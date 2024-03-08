@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
 
         
-    with open('/Users/modelt/Documents/Research/Extended Particle FIlter/Experiment 3/results_final.npy', 'wb') as f:
+    with open('/results.npy', 'wb') as f:
         pickle.dump(results, f)
 
  
