@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
 
         
-    #with open('/Users/modelt/Documents/Research/Extended Particle FIlter/Experiment 2/model1_0.npy', 'wb') as f:
+    #with open('/model1_0.npy', 'wb') as f:
         #pickle.dump(results, f)
 
  
