@@ -865,7 +865,7 @@ def test_MH_sampler():
     print("Start time:", datetime.now().strftime('%H:%M:%S'))
 
     # Set the number of iterations
-    iterations = 5
+    iterations = 1
 
     # Create empty arrays to store the results
     samples_MH_W = np.empty((iterations,), dtype=object)
@@ -929,17 +929,37 @@ def test_MH_sampler():
             print("Median of samples:", np.round(np.median(samples_WO, axis=1), decimals=3) )
 
 
-            # Find the mean over all the paths given by a single iteration for both types of filters,
-            mean_sample_path_iteration_W = np.mean(sample_paths_W, axis=1)
-            mean_sample_path_iteration_WO = np.mean(sample_paths_WO, axis=1)
-            
-            
-            # Now that we have a single path for each iteration, we can find the squared error at each time step
-            squared_error_at_each_time_step_WO =  (mean_sample_path_iteration_WO - TVP) ** 2
-            collection_squared_error_WO[i] = squared_error_at_each_time_step_WO
+            # Convert pandas series to numpy array
+            TVP_np = TVP.to_numpy()
 
-            squared_error_at_each_time_step_W =  (mean_sample_path_iteration_W - TVP) ** 2
-            collection_squared_error_W[i] = squared_error_at_each_time_step_W
+            # Calculate the squared error at each point in time for the TVP
+            squared_error_at_each_time_step_WO = (sample_paths_WO - TVP_np[:, None]) ** 2
+            squared_error_at_each_time_step_W = (sample_paths_W - TVP_np[:, None]) ** 2
+
+            # Then take the mean over all the paths given by a single iteration for both types of filters
+            mean_squared_error_iteration_WO = np.mean(squared_error_at_each_time_step_WO, axis=1)
+            mean_squared_error_iteration_W = np.mean(squared_error_at_each_time_step_W, axis=1)
+
+            # Store the mean squared error for each iteration
+            collection_squared_error_WO[i] = mean_squared_error_iteration_WO
+            collection_squared_error_W[i] = mean_squared_error_iteration_W
+
+            # print the type and size of the sample paths
+            print("Type of sample paths:", type(sample_paths_WO))
+            print("Size of sample paths:", sample_paths_WO.shape)
+
+            # print the type and size of TVP
+            print("TVP type:", type(TVP))
+            print("TVP size:", TVP.shape)
+
+            # print the type and size of the squared error
+            print("Type of squared error:", type(squared_error_at_each_time_step_WO))
+            print("Size of squared error:", squared_error_at_each_time_step_WO.shape)
+
+            # print the type and size of the mean squared error
+            print("Type of mean squared error:", type(mean_squared_error_iteration_WO))
+            print("Size of mean squared error:", mean_squared_error_iteration_WO.shape)
+
 
 
             # Save the results at each iteration
