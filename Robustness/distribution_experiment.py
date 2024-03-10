@@ -3,9 +3,6 @@ import pandas as pd
 from scipy.stats import multivariate_normal
 from scipy.stats import multivariate_t
 from datetime import datetime
-
-from scipy.special import gamma
-from numpy.linalg import det, inv
 from numpy import pi
 
 """
@@ -876,16 +873,25 @@ def test_MH_sampler():
             print("Acceptance Rate:", acceptance_N)
             print("Median of samples:", np.round(np.median(samples_N, axis=1), decimals=3) )
 
-            # Find the mean over all the paths given by a single iteration for both types of filters,
-            mean_sample_path_iteration_T = np.mean(sample_paths_T, axis=1)
-            mean_sample_path_iteration_N = np.mean(sample_paths_N, axis=1)
             
-            # Now that we have a single path for each iteration, we can find the squared error at each time step
-            squared_error_at_each_time_step_N =  (mean_sample_path_iteration_N - TVP) ** 2
-            collection_squared_error_N[i] = squared_error_at_each_time_step_N
+            # Subtract the TVP from each sample path, then square the result. LEaving a matrices of squared errors for each time step and each sample path
+            squared_error_at_each_time_step_T = (sample_paths_T - TVP.to_numpy().reshape(-1, 1)) ** 2
+            squared_error_at_each_time_step_N = (sample_paths_N - TVP.to_numpy().reshape(-1, 1)) ** 2
 
-            squared_error_at_each_time_step_T =  (mean_sample_path_iteration_T - TVP) ** 2
-            collection_squared_error_T[i] = squared_error_at_each_time_step_T
+            print("Size of sample paths:", sample_paths_N.shape)
+            print("Size of TVP:", TVP.shape)
+            print("Size of squared error at each time step:", squared_error_at_each_time_step_N.shape)
+            
+
+            # Then take the mean over all the paths given by a single iteration for both types of filters
+            mean_squared_error_iteration_T = np.mean(squared_error_at_each_time_step_T, axis=1)
+            mean_squared_error_iteration_N = np.mean(squared_error_at_each_time_step_N, axis=1)
+
+            # Store the mean squared error for each iteration
+            collection_squared_error_T[i] = mean_squared_error_iteration_T
+            collection_squared_error_N[i] = mean_squared_error_iteration_N
+
+
 
             # Save the results at each iteration
             medians_MH_T[i] = np.median(samples_T, axis=1)
@@ -920,3 +926,4 @@ def test_MH_sampler():
     return sample_mean_median_N, sample_mean_median_T, sample_std_N, sample_std_T, acceptance_mean_N, acceptance_mean_T, mean_MSE_T, mean_MSE_N
 
 
+test_MH_sampler()
