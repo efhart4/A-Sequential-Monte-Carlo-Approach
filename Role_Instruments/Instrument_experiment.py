@@ -929,12 +929,9 @@ def test_MH_sampler():
             print("Median of samples:", np.round(np.median(samples_WO, axis=1), decimals=3) )
 
 
-            # Convert pandas series to numpy array
-            TVP_np = TVP.to_numpy()
-
-            # Calculate the squared error at each point in time for the TVP
-            squared_error_at_each_time_step_WO = (sample_paths_WO - TVP_np[:, None]) ** 2
-            squared_error_at_each_time_step_W = (sample_paths_W - TVP_np[:, None]) ** 2
+            # Subtract the TVP from each sample path, then square the result. LEaving a matrices of squared errors for each time step and each sample path
+            squared_error_at_each_time_step_WO = (sample_paths_WO - TVP.to_numpy().reshape(-1, 1)) ** 2
+            squared_error_at_each_time_step_W = (sample_paths_W - TVP.to_numpy().reshape(-1, 1)) ** 2
 
             # Then take the mean over all the paths given by a single iteration for both types of filters
             mean_squared_error_iteration_WO = np.mean(squared_error_at_each_time_step_WO, axis=1)
@@ -944,7 +941,22 @@ def test_MH_sampler():
             collection_squared_error_WO[i] = mean_squared_error_iteration_WO
             collection_squared_error_W[i] = mean_squared_error_iteration_W
 
+            """
+            # print the type and size of the sample paths
+            print("Type of sample paths:", type(sample_paths_WO))
+            print("Size of sample paths:", sample_paths_WO.shape)
 
+            # print the type and size of TVP
+            print("TVP type:", type(TVP))
+            print("TVP size:", TVP.shape)
+
+            # print the type and size of the squared error
+            print("Type of squared error:", type(squared_error_at_each_time_step_WO))
+            print("Size of squared error:", squared_error_at_each_time_step_WO.shape)
+
+            # print the type and size of the mean squared error
+            print("Type of mean squared error:", type(mean_squared_error_iteration_WO))
+            print("Size of mean squared error:", mean_squared_error_iteration_WO.shape)"""
 
 
 
@@ -982,6 +994,7 @@ def test_MH_sampler():
     mean_MSE_WO = np.mean(collection_squared_error_WO, axis=0)
     
     return sample_mean_WO, sample_mean_W, mean_sample_std_WO, mean_sample_std_W, acceptance_mean_WO, acceptance_mean_W, mean_MSE_W, mean_MSE_WO
+
 
 
 
