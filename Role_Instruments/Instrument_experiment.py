@@ -944,21 +944,7 @@ def test_MH_sampler():
             collection_squared_error_WO[i] = mean_squared_error_iteration_WO
             collection_squared_error_W[i] = mean_squared_error_iteration_W
 
-            # print the type and size of the sample paths
-            print("Type of sample paths:", type(sample_paths_WO))
-            print("Size of sample paths:", sample_paths_WO.shape)
 
-            # print the type and size of TVP
-            print("TVP type:", type(TVP))
-            print("TVP size:", TVP.shape)
-
-            # print the type and size of the squared error
-            print("Type of squared error:", type(squared_error_at_each_time_step_WO))
-            print("Size of squared error:", squared_error_at_each_time_step_WO.shape)
-
-            # print the type and size of the mean squared error
-            print("Type of mean squared error:", type(mean_squared_error_iteration_WO))
-            print("Size of mean squared error:", mean_squared_error_iteration_WO.shape)
 
 
 
