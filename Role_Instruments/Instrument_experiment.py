@@ -649,11 +649,12 @@ def Metropolis_Hasting_Sampler_WO(y, x1, x2, true_theta):
                     log_prior_g = log_prior_star
                     pY_theta_g = pY_theta_star
                     accept_count += 1
-
-                if count > burn_in:
-                    samples[:, sample_count] = theta_g
-                    sample_paths[:, sample_count] = path_g
-                    sample_count += 1
+        
+        # if prior is not finite, reject the draw and sample the old value if past burn in
+        if count > burn_in:
+            samples[:, sample_count] = theta_g
+            sample_paths[:, sample_count] = path_g
+            sample_count += 1
     
                 # Print the acceptance rate every 100 draws
                 #if (count+1) % 500 == 0:
