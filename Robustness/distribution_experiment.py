@@ -592,16 +592,17 @@ def Metropolis_Hasting_Sampler_T(y, x1, x2, z, true_theta):
                     pY_theta_g = pY_theta_star
                     accept_count += 1
 
-                if count > burn_in:
-                    samples[:, sample_count] = theta_g
-                    sample_paths[:, sample_count] = path_g
-                    sample_count += 1
-    
-                # Print the acceptance rate every 100 draws
-                #if (count+1) % 500 == 0:
-                    #print("Acceptance rate:", accept_count / count) 
-                    # also print the count
-                    #print("Count:", count)
+        # if prior is not finite, reject the draw and sample the old value if past burn in
+        if count > burn_in:
+            samples[:, sample_count] = theta_g
+            sample_paths[:, sample_count] = path_g
+            sample_count += 1
+
+        # Print the acceptance rate every 100 draws
+        #if (count+1) % 500 == 0:
+            #print("Acceptance rate:", accept_count / count) 
+            # also print the count
+            #print("Count:", count)
 
     return True, sample_paths, samples, uniform_priors, (accept_count / count)
 
@@ -765,16 +766,17 @@ def Metropolis_Hasting_Sampler_N(y, x1, x2, z, true_theta):
                     pY_theta_g = pY_theta_star
                     accept_count += 1
 
-                if count > burn_in:
-                    samples[:, sample_count] = theta_g
-                    sample_paths[:, sample_count] = path_g
-                    sample_count += 1
+        # if prior is not finite, reject the draw and sample the old value if past burn in
+        if count > burn_in:
+            samples[:, sample_count] = theta_g
+            sample_paths[:, sample_count] = path_g
+            sample_count += 1
     
-                # Print the acceptance rate every 100 draws
-                #if (count+1) % 500 == 0:
-                    #print("Acceptance rate:", accept_count / count) 
-                    # also print the count
-                    #print("Count:", count)
+        # Print the acceptance rate every 100 draws
+        #if (count+1) % 500 == 0:
+            #print("Acceptance rate:", accept_count / count) 
+            # also print the count
+            #print("Count:", count)
 
     return True, sample_paths, samples, uniform_priors, (accept_count / count)
 
@@ -878,9 +880,10 @@ def test_MH_sampler():
             squared_error_at_each_time_step_T = (sample_paths_T - TVP.to_numpy().reshape(-1, 1)) ** 2
             squared_error_at_each_time_step_N = (sample_paths_N - TVP.to_numpy().reshape(-1, 1)) ** 2
 
+            """
             print("Size of sample paths:", sample_paths_N.shape)
             print("Size of TVP:", TVP.shape)
-            print("Size of squared error at each time step:", squared_error_at_each_time_step_N.shape)
+            print("Size of squared error at each time step:", squared_error_at_each_time_step_N.shape)"""
             
 
             # Then take the mean over all the paths given by a single iteration for both types of filters
@@ -926,4 +929,3 @@ def test_MH_sampler():
     return sample_mean_median_N, sample_mean_median_T, sample_std_N, sample_std_T, acceptance_mean_N, acceptance_mean_T, mean_MSE_T, mean_MSE_N
 
 
-test_MH_sampler()
